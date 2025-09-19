@@ -1,0 +1,23 @@
+# Python Functions Exercises
+
+This folder contains a series of Python exercises focused on building and using "functions" effectively. These exercises are designed to reinforce fundamental programming concepts such as:
+
+- Creating and calling functions
+- Using loops
+- Working with data structures like **tuples**, **lists**, and **dictionaries**
+
+# Highlights
+
+# Tic-Tac-Toe Game
+One of the key projects in this collection is a **Tic-Tac-Toe** game, which showcases:
+- How to break down a larger problem into smaller, reusable functions
+- The use of functions to handle different actions (e.g. displaying the board and checking for a win, taking user input)
+- Modular coding practices
+
+# Code Comments
+
+Each Python file is thoroughly commented to help you understand:
+- What each function does
+- Why certain logic or loops are used
+- How different data structures are integrated into function-based programming
+
