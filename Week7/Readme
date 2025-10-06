@@ -1,0 +1,69 @@
+Object-Oriented Programming with Python
+
+This repository contains Python programs that follow the Object-Oriented Programming (OOP) approach. 
+The programs are designed to demonstrate the use of Classes, Objects, Constructors, Methods, and the math module.
+
+Contents
+
+Python programs demonstrating the use of Classes and Objects.
+
+Implementation of Constructors to initialize object attributes.
+
+Various Methods to perform operations on the objects.
+
+Usage of Python's built-in math module for mathematical operations.
+
+Approach
+
+This week's programming exercises emphasize core Object-Oriented Programming concepts in Python. The following OOP elements are demonstrated in the code:
+
+1. Classes and Objects:
+
+Classes are used to define custom data types.
+
+Objects are instances of these classes, and they interact with methods and attributes defined within the class.
+
+2. Constructors:
+
+Constructors (__init__) are used to initialize objects with specific attributes when they are created.
+
+Example: When an object of a class is instantiated, the constructor ensures that the object starts with the correct values for its attributes.
+
+3. Methods:
+
+Methods are functions defined inside the class that allow objects to perform actions.
+
+These methods can interact with the object's attributes or even call other methods within the class.
+
+4. Math Module:
+
+The math module is used in some programs to perform mathematical operations such as calculations, square roots, trigonometric functions, etc.
+
+This module allows us to easily access a wide range of mathematical functions for more complex operations.
+
+Example Structure of Programs
+
+The programs in this repository typically have the following structure:
+
+Class Definition:
+
+A class is created with attributes and methods that define the object's behavior.
+
+Constructor:
+
+The constructor (__init__) is used to set initial values for the object when it is created.
+
+Methods:
+
+Several methods within the class perform specific tasks using the object's attributes and the math module.
+
+Using the math module:
+
+Importing the math module (import math) to handle advanced mathematical functions like math.sqrt(), math.sin(), math.factorial(), etc.
+
+Learn More
+
+The code includes comments that explain key sections, helping you understand the implementation of OOP concepts such as classes, objects, constructors, and methods. 
+The math module is also explained within the code for performing various mathematical operations.
+
+
