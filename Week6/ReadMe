@@ -1,0 +1,64 @@
+Overview
+
+This repository contains Python code developed during "Week 5". During this week, I learned and applied essential concepts of "Object-Oriented Programming (OOP)", particularly "class inheritance", and how to **integrate SQL queries directly within Python** to perform "CRUD operations" (Create, Read, Update, Delete) on a SQLite database.
+
+The primary goal was to develop a Python program that could manage parts and inventory using SQL commands embedded in the `.py` files and execute them efficiently.
+
+Key Learnings:
+
+1. Inheritance in Python**:
+
+  - I learned how to use inheritance to extend and reuse classes, allowing the `Inventory` class to inherit from the `Parts` class. This helped me avoid redundant code and organize the program more efficiently.
+
+2. Embedding SQL within Python**:
+
+  - I learned how to add SQL code directly inside Python files, use it to interact with the SQLite database, and execute queries like `CREATE`, `INSERT`, `UPDATE`, and `DELETE`. I used `sqlite3` for this purpose and executed multiple SQL statements using the `execute_script()` method.
+
+3. CRUD Operations**:
+
+  - I wrote various functions and methods to perform Create, Read, Update, and Delete operations on the database. These operations allow us to manage the inventory, add new parts, update existing ones, delete records, and fetch data efficiently.
+
+
+Files Overview
+
+1. DBbase.py
+
+This is the main class responsible for connecting to the SQLite database, executing SQL commands, and managing the connection.
+
+Key Methods:
+
+  - `connect()` – Establishes a connection to the SQLite database.
+  - `execute_script()` – Executes multiple SQL statements.
+  - `close_db()` – Properly closes the database connection.
+
+2. parts_inventory.py
+
+Contains the `Parts` and `Inventory` classes. These classes are responsible for handling the operations related to parts and inventory management.
+
+2.1 `Parts` Class:
+
+  - Performs CRUD operations for the `Parts` table in the database.
+  - Includes methods to add, update, delete, and fetch parts.
+
+2.2 `Inventory` Class (inherits from `Parts`):
+
+  - Extends the functionality to handle inventory items by adding, updating, deleting, and fetching inventory records.
+  - Inherits CRUD operations from the `Parts` class, and adds inventory-specific logic.
+
+3. project_class.py
+
+Contains methods that run the program, managing user interaction with the system and providing functionalities like fetching all inventory, updating inventory, and resetting the database.
+
+Key Methods:
+
+  - `get()` – Retrieves all inventory records.
+  - `getby()` – Retrieves inventory by ID.
+  - `update()` – Updates inventory records.
+  - `add()` – Adds new inventory records.
+  - `delete()` – Deletes inventory records.
+  - `reset()` – Resets the database (drops and recreates the tables).
+  - `exit()` – Exits the program.
+
+4. test.py
+
+A testing script where I tested individual components and CRUD operations before integrating them into the main `project_class.py` script. This ensures that each database operation works as expected.
