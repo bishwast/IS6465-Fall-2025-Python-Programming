@@ -1,0 +1,152 @@
+Boat Rental System
+
+This is a boat rental system I built, which is divided into several key components for managing the database, business logic, and user interface. Below is a breakdown of how the system works and what each file does.
+
+---
+
+1. `DBbase.py` (The Foundation)
+
+This file contains the base class `DBbase`, which is responsible for managing the connection to the SQLite database. I created this class so that other classes could inherit from it, avoiding repetitive connection code.
+
+1.1 `__init__(self, db_name)`
+
+This is the constructor. When I create an object from this class (or a child class), I need to provide the database name, such as `'boat_rental.sqlite'`. The constructor immediately calls the `connect()` method.
+
+1.2 `connect(self)`
+
+This method uses the `sqlite3` library to establish a connection to the database file and creates the `_conn` object. It also creates a `_cursor` object, which I use to run SQL commands.
+
+1.3 `execute_script(self, sql_string)`
+
+This helper method allows me to run multiple SQL statements at once. I use this in methods like `reset_database()` to DROP and CREATE tables in one go.
+
+1.4 `close_db(self)`
+
+This method safely shuts down the database connection. It commits any pending changes, closes the cursor, and finally closes the connection. The check `if self._conn is not None` prevents errors if I try to close an already closed connection.
+
+1.5 `@property get_cursor` and `get_connection`
+
+These are "getter" methods. They allow other classes to read the `_cursor` and `_conn` objects without modifying them. This follows the OOP principle of encapsulation.
+
+---
+
+2. `boat_rental_entities.py` (The "Brain" / Data Layer)
+
+This is the heart of the system. It contains all the business logic and SQL queries. The file has four classes: `Boat`, `Customers`, `Rentals`, and `DataPopulator`.
+
+---
+
+3. `Class Boat(db.DBbase)`
+
+This class manages everything related to the boat inventory. It inherits from `DBbase`, so it automatically has access to the database connection.
+
+3.1 `__init__`
+
+The constructor calls the parent class' constructor and tells it to use the `'boat_rental.sqlite'` database.
+
+3.2 `reset_database`
+
+This method defines the schema for the `boat_rental_entities` table. It uses SQL to DROP the table if it exists, then CREATE it with necessary columns like `BoatType`, `Capacity`, and `AvailabilityStatus`.
+
+3.3 `add`
+
+This is the "Create" function. It accepts boat details as arguments and uses an `INSERT INTO` query to add a new boat to the database.
+
+3.4 `update`
+
+This is the "Update" function. It's dynamic, updating only the fields I provide. It builds the SQL query depending on whether I’m updating the `hourly_rate`, `availability_status`, or both. This is how I mark a boat as "Rented" or "Available".
+
+3.5 `fetch`
+
+This is the "Read" function. It can fetch all boats, a single boat by its `boat_id`, or all boats of a specific `boat_type`.
+
+---
+
+4. `Class Customers(db.DBbase)`
+
+This class is very similar to `Boat`, but it manages the `Customers` table.
+
+4.1 `reset_database`
+
+This defines the schema for the `Customers` table. I made the `Phone` column `UNIQUE` to avoid duplicate customers.
+
+4.2 `add`
+
+This method is a bit smarter. Before adding a new customer, it checks if the customer already exists by calling `self.fetch()` using the phone number. If the customer exists, it returns their existing ID. If not, it runs an `INSERT INTO` query to add the new customer.
+
+---
+
+5. `Class Rentals(db.DBbase)`
+
+This class ties everything together. It manages the `Rentals` table, which links boats to customers.
+
+5.1 `reset_database`
+
+This schema is crucial. It uses Foreign Keys (`boat_id` and `customer_id`) to create relationships with the other tables, ensuring that I can’t rent a boat that doesn't exist or rent to a customer who isn't in the system.
+
+5.2 `rental_booking_records`
+
+This method handles the booking of a rental. It creates a `Boat` instance to act as the "manager". It fetches the boat to check if its `AvailabilityStatus` is "Available". If it is, the method creates a new record in the `Rentals` table, updates the boat's status to "Rented", and returns `True` or `False` depending on whether the booking was successful.
+
+5.3 `complete_rental`
+
+This method handles the return process of a boat. It creates a `Boat` instance, fetches the rental record to get the `boat_id` and `hourly_rate`, calculates the total costs based on rental hours, and updates the rental record. It also updates the boat's status to "Available" once the rental is complete.
+
+5.4 `fetch_rental`
+
+This method combines data from all three tables using a `LEFT JOIN`, which lets me view both the customer and boat details together, rather than just their IDs.
+
+---
+
+6. `Class DataPopulator`
+
+This is a utility class. Its job is to create a fresh, clean database with sample data for testing purposes.
+
+6.1 `populate_database`
+
+This method does everything. It deletes the old `boat_rental.sqlite` file (great for development), creates new instances of `Boat`, `Customers`, and `Rentals`, and calls their `reset_database()` methods to rebuild the tables.
+
+It also reads a `boat_rentals.csv` file, using `executemany()` to bulk-insert boat data, adds hardcoded sample customers, and books an initial rental for 'Alice Smith' to ensure the "Active Rentals" list isn't empty on the first run.
+
+---
+
+7. `boat_rental_menu.py` (The "Face" / Presentation Layer 🖥️)
+
+This file manages user interaction. It’s the “face” of the program and contains no SQL or complex logic. It simply prints menus, collects user input, and calls the appropriate methods from `boat_rental_entities.py`. This is an example of Separation of Concerns.
+
+7.1 `run`
+
+This is the main loop of the program. I set `DEV_MODE = True` to reset the database every time the script runs. The method creates a dictionary of menu options and runs a loop that continues until the user types `'exit'`.
+
+Inside the loop, it prints the menu, gets the user's choice, and calls the appropriate function using an `if/elif/else` chain.
+
+7.2 `_display_results`
+
+A simple helper function I wrote to print lists of data in a clean and consistent format.
+
+7.3 `_view_inventory` / `_view_rent`
+
+These are simple methods that create an instance of `Boat` or `Rentals`, call the `fetch()` method, and pass the results to `_display_results`.
+
+7.4 `_add_boat`
+
+This method prompts the user to enter a new boat's details. It uses a `try-except` block to ensure the user enters valid numbers for the boat's capacity and rate.
+
+7.5 `_book_rental`
+
+One of the more complex menu functions. It walks the user through the entire booking process:
+
+1. Gets the customer’s phone number and checks if they exist.
+2. If the customer doesn't exist, it collects their information and adds them to the system.
+3. Displays a list of available boats and asks the user to pick a `boat_id`.
+4. Finally, it calls `rentals.rental_booking_records()` and prints a confirmation or failure message.
+
+7.6 `_complete_rental`
+
+This function handles the process of returning a boat:
+
+1. It fetches active rentals and displays them.
+2. The user selects a rental to return.
+3. It calculates the rental hours, asks for confirmation, and if confirmed, calls `rentals.complete_rental()` to finish the process.
+
+---
