@@ -1,0 +1,179 @@
+1. DBbase.py (The Foundation)
+    This is our base class, DBbase. Its only job is to manage the connection to the SQLite database. We created this
+    class so our other classes could inherit from it, and we wouldn't have to repeat the connection code.
+
+    1.1) __init__(self, db_name):
+        This is the constructor. When we create an object from this class (or a child class), we have
+        to give it a database name, like 'boat_rental.sqlite'. It then immediately calls the connect method.
+
+    1.2) connect(self):
+        This method uses the sqlite3 library to open a connection to the database file and creates a _conn
+        object. It also creates a _cursor object, which is what we use to actually run SQL commands.
+
+    1.3) execute_script(self, sql_string):
+        This is a helper function that lets us run multiple SQL statements at once, which we use in our reset_database
+        methods to DROP and CREATE tables in one step."
+
+    1.4) close_db(self):
+        This is a critical method for safely shutting down the database connection. It first commits (saves)
+        any pending changes, then closes the cursor, and finally closes the connection.
+        Then if self._conn is not None: check prevents the program from crashing if we try to close a connection
+        that's already closed.
+
+    1.5) @property get_cursor and get_connection:
+        These are 'getters.' They let our other classes read the _cursor and _conn objects without being able to
+        accidentally change them. This is a good OOP principle called encapsulation.
+
+2. boat_rental_entities.py (The "Brain" / Data Layer)
+    This is the most important file. It contains all our business logic and SQL queries. It's the 'brain' of the
+    operation. It has four classes: Boat, Customers, Rentals, and the DataPopulator.
+
+3. Class Boat(db.DBbase)
+    This class manages everything related to the boat inventory. It inherits from DBbase, so it automatically gets a
+    database connection.
+
+    3.1) __init__:
+        The constructor just calls the parent's (super) constructor and tells it to use the 'boat_rental.sqlite'
+        database.
+
+    3.2) reset_database:
+        This method defines the schema for our boat inventory table, boat_rental_entities. It uses SQL to DROP
+        the table if it exists and then CREATE it with all the columns we need, like BoatType, Capacity, and
+        AvailabilityStatus.
+
+    3.4) add:
+        This is our 'Create' function. It takes all the boat details as arguments and uses an INSERT INTO query to add a
+        new boat to the database.
+
+    3.5) update:
+        This is our 'Update' function. We made it dynamic, so it only updates the fields we provide. It builds the SQL
+        query based on whether we're updating the hourly_rate, the availability_status, or both. This is how we set a
+        boat to 'Rented' or 'Available'.
+
+    3.6) fetch:
+        This is our 'Read' function. It can fetch all boats, a single boat by its boat_id, or all boats of a specific
+        boat_type.
+
+4. Class Customers(db.DBbase)
+    This class is very similar to Boat, but it manages the Customers table.
+
+    4.1) reset_database:
+        This defines the Customers table schema. We made the Phone column UNIQUE to prevent duplicate
+        customers.
+
+    4.2) add:
+        This method is a bit smart. Before adding a new customer, it first calls self.fetch using the phone number.
+        If it finds a customer, it returns their existing ID. If not, it runs the INSERT INTO query to create the
+        new customer.
+
+5. Class Rentals(db.DBbase)
+    This class connects everything. It manages the Rentals table, which links boats to customers.
+
+    5.1) reset_database:
+        This schema is the most important. It uses Foreign Keys (boat_id and customer_id) to create a
+        relationship with the other two tables. This ensures we can't rent a boat that doesn't exist or rent to a
+        customer that doesn't exist.
+
+    5.2) rental_booking_records:
+        This is a key 'transaction' method. It's what we call when we book a rental.
+
+        First, it creates a Boat() instance to act as a 'manager'. It fetches the boat to check if its
+        AvailabilityStatus is 'Available'.
+
+        If it is (Available), it INSERT's a new record into the Rentals table with the boat_id, customer_id,
+        and StartTime.
+
+        Then, it uses the boat_manager to update the boat's status to 'Rented'.
+
+        It returns True or False to let the Menu know if the booking was successful."
+
+    5.3) complete_rental:
+        This is the other major transaction, for returning a boat.
+
+        It creates a Boat() instance.
+
+        It fetches the rental record to get the boat_id and hourly_rate.
+
+        It calculates the total_costs based on the rental_hours.
+
+        It UPDATE's the Rentals record with the EndTime, TotalRentalHours, TotalCosts, and sets the Rental_Status
+        to 'Completed'.
+
+        Finally, it uses the boat_manager to update the boat's status back to 'Available'.
+
+    5.4) fetch_rental:
+        This is our most complex query. It uses LEFT JOIN to combine all three tables. This lets us show the
+        customer's name and the boat's name in the menu, instead of just their IDs.
+
+6. Class DataPopulator
+    This class is a setup utility. Its job is to create a fresh, clean database with sample data for testing.
+
+    6.1) populate_database:
+        This method does it all.
+
+        It deletes the old boat_rental.sqlite file (this is great for development).
+
+        It creates new instances of Boat, Customers, and Rentals and calls their reset_database methods to build
+        the tables.
+
+        It performs File I/O by opening and reading the boat_rentals.csv file and uses executemany() to
+        bulk-insert all the boats.
+
+        It adds a list of hard-coded sample customers.
+
+        It books one initial rental for 'Alice Smith' so the 'Active Rentals' list isn't empty on the first run."
+
+7. boat_rental_menu.py (The "Face" / Presentation Layer 🖥️)
+    This file handles all user interaction. It's the 'face' of our program. It doesn't contain any SQL or complex logic.
+    It just prints menus, gets user input, and calls the appropriate methods from boat_rental_entities.py.
+    This is called Separation of Concerns.
+
+    7.1) run:
+        This is the main loop of the program.
+
+        It sets DEV_MODE = True, which tells our DataPopulator to reset the database every time we run the script.
+
+        It creates a dictionary of menu options.
+
+        It has a while loop that keeps running until the user types 'exit'.
+
+        Inside the loop, it prints the menu, gets the user's choice, and uses an if/elif/else chain to call the correct
+        function.
+
+    7.2) _display_results:
+        This is a simple helper function we wrote to print lists of data in a clean, consistent format.
+
+    7.3) _view_inventory / _view_rent:
+        These are simple methods. They create an instance of Boat or Rentals, call the fetch method, and pass the
+        results to _display_results.
+
+    7.4) _add_boat:
+        This method gets all the new boat's details from the user. It uses a try-except ValueError block to make
+        sure the user enters numbers for capacity and rate, preventing a crash.
+
+    7.5) _book_rental:
+        This is one of our most complex menu functions. It guides the user through the whole booking process:
+
+        It gets the customer's phone number and calls customers.fetch() to see if they exist.
+
+        If they don't (phone number), it gets the new customer's info and calls customers.add().
+
+        It then calls boats.fetch() to show a list of available boats.
+
+        It asks the user to pick a boat_id.
+
+        Finally, it calls rentals.rental_booking_records() and checks the True/False return value to print a 'Confirmed'
+        or 'Failed' message.
+
+    7.6) _complete_rental:
+        This is the 'return' process.
+
+        It calls rentals.fetch_rental(status="Active") to show only the rentals that need to be returned.
+
+        It asks the user to pick a rental_id.
+
+        It fetches that rental's record to get its StartTime.
+
+        It calculates the rental_hours (with a minimum charge of 0.25 hours).
+
+        It asks for confirmation, and if 'y', it calls rentals.complete_rental() to finish the process.

@@ -1,0 +1,21 @@
+Date,BoatType,Make,Model,Capacity,HourlyRate,AvailabilityStatus
+10/21/2025,Sailboat,Beneteau,Oceanis 38.1,8,120,Available
+10/21/2025,Motorboat,Yamaha,212X,10,150,Available
+10/21/2025,Kayak,Perception,Pescador Pro 12,1,20,Available
+10/21/2025,Jet Ski,Sea-Doo,GTX Limited,2,90,Available
+10/21/2025,Pontoon,Sun Tracker,Party Barge 22 DLX,12,110,Available
+10/22/2025,Fishing Boat,Tracker,Pro Team 195,4,90,Available
+10/23/2025,Canoe,Old Town,Discovery 158,3,30,Available
+10/24/2025,Sailboat,Catalina,22 Sport,5,95,Available
+10/25/2025,Motorboat,Sea Ray,SPX 190,7,140,Available
+10/26/2025,Kayak,Kawasaki,Ultra 319X,3,110,Available
+10/27/2025,Jet Ski,Hobie,Mirage Outback,3,110,Available
+10/28/2025,Pontoon,Bennington,L Series,3,110,Available
+10/29/2025,Fishing Boat,Lund,Impact 875,3,110,Available
+10/30/2025,Canoe,Wenonah,Spirit II,3,110,Available
+10/31/2025,Sailboat,Hunter,H 33,3,110,Available
+11/1/2025,Motorboat,Boston Whaler,170 Mont,3,110,Available
+11/2/2025,Kayak,Wilderness Sys,Pungo 120,3,110,Available
+11/3/2025,Fishing Boat,Alumacraft,Fish 370,3,110,Available
+11/4/2025,Fun Boat,UtahBoat,UT 123,10,120,Available
+11/5/2025,Wed Boat,TX WED,Wed 123,20,200,Available
